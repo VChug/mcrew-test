@@ -1,51 +1,34 @@
-#!groovy​
-podTemplate(label: 'pod-hugo-app', containers: [
-    containerTemplate(name: 'hugo', image: 'smesch/hugo', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'html-proofer', image: 'smesch/html-proofer', ttyEnabled: true, command: 'cat'),
-    containerTemplate(name: 'kubectl', image: 'smesch/kubectl', ttyEnabled: true, command: 'cat',
-        volumes: [secretVolume(secretName: 'kube-config', mountPath: '/root/.kube')]),
-    containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat',
-        envVars: [containerEnvVar(key: 'DOCKER_CONFIG', value: '/tmp/'),])],
-        volumes: [secretVolume(secretName: 'docker-config', mountPath: '/tmp'),
-                  hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')
-  ]) {
+node {
+  // Mark the code checkout 'stage'....
+  stage 'Stage Checkout'
 
-    node('pod-hugo-app') {
+  // Checkout code from repository and update any submodules
+  checkout scm
+  sh 'git submodule update --init'  
 
-        def DOCKER_HUB_ACCOUNT = 'smesch'
-        def DOCKER_IMAGE_NAME = 'hugo-app-jenkins'
-        def K8S_DEPLOYMENT_NAME = 'hugo-app'
+  stage 'Stage Build'
 
-        stage('Clone Hugo App Repository') {
-            checkout scm
- 
-            container('hugo') {
-                stage('Build Hugo Site') {
-                    sh ("hugo --uglyURLs")
-                }
-            }
-    
-            container('html-proofer') {
-                stage('Validate HTML') {
-                    sh ("htmlproofer public --internal-domains ${env.JOB_NAME} --external_only --only-4xx")
-                }
-            }
+  //branch name from Jenkins environment variables
+  echo "My branch is: ${env.BRANCH_NAME}"
 
-            container('docker') {
-                stage('Docker Build & Push Current & Latest Versions') {
-                    sh ("docker build -t ${DOCKER_HUB_ACCOUNT}/${DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER} .")
-                    sh ("docker push ${DOCKER_HUB_ACCOUNT}/${DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}")
-                    sh ("docker tag ${DOCKER_HUB_ACCOUNT}/${DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER} ${DOCKER_HUB_ACCOUNT}/${DOCKER_IMAGE_NAME}:latest")
-                    sh ("docker push ${DOCKER_HUB_ACCOUNT}/${DOCKER_IMAGE_NAME}:latest")
-                }
-            }
-            
-            container('kubectl') {
-                stage('Deploy New Build To Kubernetes') {
-                    sh ("kubectl set image deployment/${K8S_DEPLOYMENT_NAME} ${K8S_DEPLOYMENT_NAME}=${DOCKER_HUB_ACCOUNT}/${DOCKER_IMAGE_NAME}:${env.BUILD_NUMBER}")
-                }
-            }
+  def flavor = flavor(env.BRANCH_NAME)
+  echo "Building flavor ${flavor}"
 
-        }        
-    }
+  //build your gradle flavor, passes the current build number as a parameter to gradle
+  sh "./gradlew clean assemble${flavor}Debug -PBUILD_NUMBER=${env.BUILD_NUMBER}"
+
+  stage 'Stage Archive'
+  //tell Jenkins to archive the apks
+  archiveArtifacts artifacts: 'app/build/outputs/apk/*.apk', fingerprint: true
+
+  stage 'Stage Upload To Fabric'
+  sh "./gradlew crashlyticsUploadDistribution${flavor}Debug  -PBUILD_NUMBER=${env.BUILD_NUMBER}"
+}
+
+// Pulls the android flavor out of the branch name the branch is prepended with /QA_
+@NonCPS
+def flavor(branchName) {
+  def matcher = (env.BRANCH_NAME =~ /QA_([a-z_]+)/)
+  assert matcher.matches()
+  matcher[0][1]
 }
