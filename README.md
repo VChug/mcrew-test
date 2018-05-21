@@ -61,3 +61,56 @@ Step 1: Create a new pipeline.
 Step 2: Give a unique name for the pipeline.
 
 Step 3: Go to ***Pipeline*** tab and Select ***Pipeline Script from SCM***
+
+Step 4: Select Git from the SCM and enter the URL for your Git repository
+
+Note it will be linked automatically if it is a public repo. For the private repo you need to add your credentials, either in a form of Username and password or we can do it from SSH key from Github.
+
+ssh-keygen
+save it and add it into your github repository and then add into Jenkins credentials with your private key selecting add credentials using SSH and Private Key.
+
+Add a branch if you had any existing where your repository is present.
+
+Step 5: Under the Script path we have to mention Jenkinsfile
+
+Which we already added to our repository so that when we Build this pipeline it will take the jenkins file to build and deploy the kuberentes.
+
+Step 6: Click on Apply and save it. Before Build for this Pipeline please go through the deployment steps below to check if evrything is set up fine and working appropriately to make this build error free.
+
+Deploying to Kubernetes
+Although we can do this using Kube deploy plugin present in the Jenkins as well but for now we have added all those steps on Jenkinsfile so that it will take all this process automatically.
+
+Under staging we need to add following code in Jenkinsfile so that it can perform the deployment automatically.
+
+ kubernetesDeploy(kubeconfigId: 'kubeconfig',
+                     configs: 'deploy.yaml',
+                     enableConfigSubstitution: false)
+The deploy.yaml file for the above deployment would looks like:
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: sample-k8s-deployment-3
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sample-k8s-app
+    spec:
+      containers:
+      - name: sample-k8s-app-container
+        image: <docker-image name>
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+Finishing the Build and Result
+So when everything is configured according to the deployment step we can go ahead and click on Build for the Pipeline we had set up and when you go through the Console Output you will see first this pipeline will obtain Jenkinsfile form the Github repository we mentioned and then will run the pipeline with all Builds, fetching docker images etc. and finally deploying it onto kuberentes.
+
+The Application will be deployed on port 8080 at end of deployment.
+
+You can check the results using following kubectl commands:
+
+kubectl get po
+kubectl get deploy
+You will notice the status of the deployment we performed will be seen as Running.
