@@ -23,7 +23,7 @@ node {
         
         
         docker.withRegistry("https://456624778202.dkr.ecr.us-east-1.amazonaws.com", "ecr:us-east-1:aws-credentials") {
-            docker.image("arn:aws:ecr:us-east-1:456624778202:repository/genodejs").push()  
+            docker.image("genodejs:latest").push()  
         }
         
 
