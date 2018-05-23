@@ -22,7 +22,7 @@ node {
          * Pushing multiple tags is cheap, as all the layers are reused. */
         
         
-        docker.withRegistry("https://456624778202.dkr.ecr.us-east-1.amazonaws.com", "aws-credentials") {
+        docker.withRegistry("https://456624778202.dkr.ecr.us-east-1.amazonaws.com", "ecr:aws-credentials") {
             docker.image("456624778202.dkr.ecr.us-east-1.amazonaws.com/genodejs").push()  
         }
         
