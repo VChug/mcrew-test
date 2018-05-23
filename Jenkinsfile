@@ -11,7 +11,7 @@ node {
         /* This builds the actual image; synonymous to
          * docker build on the command line */
 
-        app = docker.build("vaibhav27/hello-world")
+        app = docker.build("456624778202.dkr.ecr.us-east-1.amazonaws.com/genodejs")
     }
 
 
