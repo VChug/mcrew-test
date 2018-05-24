@@ -1,5 +1,5 @@
 # use a node base image
-FROM node:7-onbuild
+FROM node:456624778202.dkr.ecr.us-east-1.amazonaws.com/genodejs
 
 # set maintainer
 
