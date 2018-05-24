@@ -11,7 +11,7 @@ node {
         /* This builds the actual image; synonymous to
          * docker build on the command line */
 
-        app = docker.build("456624778202.dkr.ecr.us-east-1.amazonaws.com/genodejs")
+        app = docker.build("135512800999.dkr.ecr.us-east-1.amazonaws.com/torq-portal")
     }
 
 
@@ -21,8 +21,8 @@ node {
          * Second, the 'latest' tag.
          * Pushing multiple tags is cheap, as all the layers are reused. */
         
-        docker.withRegistry("https://456624778202.dkr.ecr.us-east-1.amazonaws.com", "ecr:us-east-1:aws-credentials") {
-            docker.image("456624778202.dkr.ecr.us-east-1.amazonaws.com/genodejs").push()  
+        docker.withRegistry("https://135512800999.dkr.ecr.us-east-1.amazonaws.com", "ecr:us-east-1:aws-credentials") {
+            docker.image("135512800999.dkr.ecr.us-east-1.amazonaws.com/torq-portal").push()  
         }
         
 
