@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: sample-k8s-app-container
-        image: 456624778202.dkr.ecr.us-east-1.amazonaws.com/genodejs
+        image: 135512800999.dkr.ecr.us-east-1.amazonaws.com/torq-portal
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
