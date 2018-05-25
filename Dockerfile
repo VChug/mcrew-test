@@ -1,5 +1,5 @@
 # use a node base image
-FROM 135512800999.dkr.ecr.us-east-1.amazonaws.com/hello-world
+FROM node:7-onbuild
 
 # set maintainer
 
