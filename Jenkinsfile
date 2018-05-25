@@ -11,7 +11,7 @@ node {
         /* This builds the actual image; synonymous to
          * docker build on the command line */
 
-        app = docker.build("456624778202.dkr.ecr.us-east-1.amazonaws.com/genodejs")
+        app = docker.build("135512800999.dkr.ecr.us-east-1.amazonaws.com/hello-world")
     }
 
 
@@ -23,7 +23,7 @@ node {
         
         
         docker.withRegistry("https://456624778202.dkr.ecr.us-east-1.amazonaws.com", "ecr:us-east-1:aws-credentials") {
-            docker.image("456624778202.dkr.ecr.us-east-1.amazonaws.com/genodejs").push()  
+            docker.image("135512800999.dkr.ecr.us-east-1.amazonaws.com/hello-world").push()  
         }
         
 
