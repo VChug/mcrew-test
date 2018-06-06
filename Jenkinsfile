@@ -12,7 +12,7 @@ node {
         /* This builds the actual image; synonymous to
          * docker build on the command line */
 
-        app = docker.build("456624778202.dkr.ecr.us-east-1.amazonaws.com/genodejs")
+        app = docker.build("registry.gear.ge.com/212587274/test")
     }
 
 
@@ -23,8 +23,8 @@ node {
          * Pushing multiple tags is cheap, as all the layers are reused. */
         
         
-        docker.withRegistry("https://456624778202.dkr.ecr.us-east-1.amazonaws.com", "ecr:us-east-1:aws-credentials") {
-            docker.image("456624778202.dkr.ecr.us-east-1.amazonaws.com/genodejs").push()  
+        docker.withRegistry("https://registry.gear.ge.com", "docker-hub-credentials") {
+            docker.image("registry.gear.ge.com/212587274/test").push()  
         }
         
 
