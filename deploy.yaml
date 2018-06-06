@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: sample-k8s-app-container
-        image: registry.gear.ge.com/212587274/test
+        image: 456624778202.dkr.ecr.us-east-1.amazonaws.com/genodejs
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
